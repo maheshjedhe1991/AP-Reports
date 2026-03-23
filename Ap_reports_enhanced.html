@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AP Dashboard — Finance Intelligence Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Nunito Sans',system-ui,sans-serif;background:#f2f4f7;color:#1a1a2e;-webkit-font-smoothing:antialiased}
+:root{
+  --navy:#0d1b3e;--navymid:#1a3060;--blue:#1a56db;--bluesoft:#e8f0fe;--bluelite:#dbeafe;
+  --teal:#059669;--tealsoft:#d1fae5;--amber:#d97706;--ambersoft:#fef3c7;
+  --red:#dc2626;--redsoft:#fee2e2;--green:#16a34a;--greensoft:#dcfce7;
+  --purple:#7c3aed;--purplesoft:#ede9fe;--orange:#ea580c;
+  --surface:#ffffff;--raised:#f8f9fb;--border:#e5e7eb;--muted:#6b7280;--hint:#d1d5db;
+  --display:'Syne',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --body:'Nunito Sans',system-ui,sans-serif;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:0 4px 12px rgba(0,0,0,.10),0 2px 4px rgba(0,0,0,.05);
+}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:#f2f4f7}
+::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
+
+/* ── Navbar ── */
+.navbar{background:var(--navy);height:58px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.nav-brand{display:flex;align-items:center;gap:12px}
+.nav-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1a56db,#3b82f6);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:13px;color:#fff;box-shadow:0 2px 8px rgba(26,86,219,.4)}
+.nav-title{font-family:var(--display);font-weight:700;font-size:15px;color:#fff;letter-spacing:-.01em}
+.nav-sub{font-family:var(--mono);font-size:9px;color:#7ba8d4;text-transform:uppercase;letter-spacing:.1em}
+.nav-tabs{display:flex;align-items:center;gap:2px}
+.nav-tab{padding:7px 18px;border-radius:7px;border:none;background:transparent;color:#94a3b8;font-family:var(--body);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;position:relative}
+.nav-tab:hover{color:#e2e8f0;background:rgba(255,255,255,.07)}
+.nav-tab.active{color:#fff;background:rgba(255,255,255,.12)}
+.nav-tab.active::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:20px;height:2px;background:#3b82f6;border-radius:2px}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-badge{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.25)}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#374151,#1f2937);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:10px;color:#94a3b8;cursor:pointer;border:1.5px solid #374151}
+
+/* ── Sub-header ── */
+.subheader{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.subheader h1{font-family:var(--display);font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.02em}
+.subheader-meta{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:3px}
+.subheader-meta span{color:var(--blue)}
+.period-btns{display:flex;gap:4px;background:var(--raised);padding:3px;border-radius:8px;border:1px solid var(--border)}
+.period-btn{padding:5px 16px;border-radius:6px;border:none;background:transparent;color:var(--muted);font-family:var(--mono);font-size:11px;cursor:pointer;font-weight:500;transition:all .2s}
+.period-btn.active{background:var(--navy);color:#fff;box-shadow:0 1px 4px rgba(13,27,62,.3)}
+.period-btn:hover:not(.active){background:var(--border);color:var(--navy)}
+
+/* ── KPI Band ── */
+.kpi-band{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 28px}
+.kpi-row{display:flex;gap:12px;max-width:1440px;margin:0 auto}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;flex:1 1 0;min-width:0;cursor:default;transition:all .2s;position:relative;overflow:hidden}
+.kpi-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);border-color:#c7d2fe}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.kpi-card.navy::before{background:var(--navy)}
+.kpi-card.green::before{background:var(--green)}
+.kpi-card.amber::before{background:var(--amber)}
+.kpi-card.red::before{background:var(--red)}
+.kpi-card.blue::before{background:var(--blue)}
+.kpi-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.kpi-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.kpi-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.kpi-value{font-family:var(--display);font-size:24px;font-weight:700;color:var(--navy);letter-spacing:-.03em;margin-bottom:4px;transition:all .3s}
+.kpi-sub{font-family:var(--body);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.kpi-trend{font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 6px;border-radius:4px}
+.trend-up{background:var(--greensoft);color:var(--green)}
+.trend-down{background:var(--redsoft);color:var(--red)}
+.trend-warn{background:var(--ambersoft);color:var(--amber)}
+
+/* ── Main ── */
+.main{padding:20px 28px;max-width:1440px;margin:0 auto}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+.grid-1-2{display:grid;grid-template-columns:1fr 2fr;gap:14px;margin-bottom:14px}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card:last-child{margin-bottom:0}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-title{font-family:var(--display);font-size:13px;font-weight:700;color:var(--navy);letter-spacing:-.01em}
+.card-hint{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.chart-wrap{position:relative}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.badge-dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
+.badge-paid{background:var(--greensoft);color:var(--green)}
+.badge-approved{background:var(--bluelite);color:var(--blue)}
+.badge-pending{background:var(--ambersoft);color:var(--amber)}
+.badge-overdue{background:var(--redsoft);color:var(--red)}
+.badge-disputed{background:var(--purplesoft);color:var(--purple)}
+.badge-partial{background:var(--ambersoft);color:var(--amber)}
+.badge-unpaid{background:var(--redsoft);color:var(--red)}
+
+/* ── Tables ── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--raised)}
+th{padding:10px 12px;text-align:left;font-family:var(--mono);font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s}
+th:hover{color:var(--navy)}
+th .sort-icon{opacity:.4;margin-left:4px;font-size:9px}
+th.sorted .sort-icon{opacity:1;color:var(--blue)}
+th.right,td.right{text-align:right}
+td{padding:10px 12px;font-family:var(--body);font-size:12px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+td.id{font-family:var(--mono);font-size:11px;color:var(--blue);font-weight:500;cursor:pointer}
+td.id:hover{text-decoration:underline}
+td.amount{font-family:var(--mono);font-size:12px;color:var(--navy);font-weight:500;text-align:right}
+td.vendor{color:var(--navy);font-weight:600}
+td.aging-high{color:var(--red);font-family:var(--mono);font-weight:500}
+td.aging-mid{color:var(--orange);font-family:var(--mono)}
+td.days-over{color:var(--red);font-family:var(--mono);font-size:11px;font-weight:600}
+td.days-warn{color:var(--amber);font-family:var(--mono);font-size:11px}
+tbody tr:hover{background:var(--bluesoft)!important;cursor:default}
+.tbl-footer{padding:10px 18px;border-top:1px solid var(--border);background:var(--raised);display:flex;gap:24px;border-radius:0 0 12px 12px}
+.tbl-footer-stat{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.tbl-footer-stat strong{color:var(--navy);font-size:11px;margin-left:4px}
+
+/* ── Ops cards ── */
+.ops-card{background:var(--raised);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:box-shadow .2s}
+.ops-card:hover{box-shadow:var(--shadow-md)}
+.ops-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.ops-value{font-family:var(--display);font-size:22px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.ops-sub{font-family:var(--body);font-size:11px;color:var(--muted)}
+.progress-bar{height:5px;background:var(--border);border-radius:3px;margin:7px 0 4px}
+.progress-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* ── Hold reasons ── */
+.hold-row{margin-bottom:10px}
+.hold-top{display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px}
+.hold-label{color:var(--navy);font-weight:500}
+.hold-count{font-family:var(--mono);color:var(--muted);font-size:11px}
+.hold-bar{height:4px;background:var(--border);border-radius:2px}
+.hold-fill{height:100%;background:var(--navy);border-radius:2px;transition:width .5s ease}
+
+/* ── Legend ── */
+.legend{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.legend-line{width:18px;height:3px;border-radius:2px;flex-shrink:0}
+
+/* ── Filters ── */
+.filter-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.search-input{padding:7px 12px 7px 32px;border-radius:8px;border:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--navy);background:var(--raised);width:230px;outline:none;transition:border-color .2s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.742 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px center}
+.search-input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(26,86,219,.1)}
+.filter-select{padding:7px 10px;border-radius:8px;border:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--raised);cursor:pointer;outline:none;transition:border-color .2s}
+.filter-select:focus{border-color:var(--blue)}
+.tbl-meta{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:auto}
+
+/* ── Status filter pills ── */
+.status-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.pill{padding:4px 12px;border-radius:20px;font-family:var(--mono);font-size:10px;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all .2s}
+.pill:hover{opacity:.85}
+.pill.active{box-shadow:0 0 0 2px rgba(26,86,219,.25)}
+.pill-all{background:var(--raised);border-color:var(--border);color:var(--muted)}
+.pill-all.active{background:var(--navy);border-color:var(--navy);color:#fff}
+
+/* ── Donut ── */
+.donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.donut-legend{display:flex;flex-direction:column;gap:7px;flex:1}
+.donut-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 8px;border-radius:7px;cursor:pointer;transition:background .15s}
+.donut-row:hover{background:var(--raised)}
+.donut-row.dimmed{opacity:.4}
+.donut-label{display:flex;align-items:center;gap:8px;font-family:var(--body);font-size:12px;color:var(--muted)}
+.donut-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.donut-count{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--navy)}
+.donut-pct{font-family:var(--mono);font-size:10px;color:var(--hint);margin-left:2px}
+
+/* ── Rate bar ── */
+.rate-bar-wrap{display:flex;align-items:center;gap:8px}
+.rate-bar-track{flex:1;height:5px;background:var(--border);border-radius:3px}
+.rate-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+
+/* ── Active filter banner ── */
+.active-filter-banner{background:var(--bluelite);border:1px solid #bfdbfe;border-radius:8px;padding:6px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-family:var(--mono);font-size:11px;color:var(--blue)}
+.filter-clear-btn{background:none;border:none;color:var(--blue);cursor:pointer;font-family:var(--mono);font-size:10px;text-decoration:underline}
+
+/* ── Inline sparkline ── */
+.spark-wrap{display:flex;align-items:flex-end;gap:2px;height:24px}
+.spark-bar{width:4px;border-radius:1px;background:rgba(26,86,219,.3)}
+.spark-bar.high{background:#1a56db}
+
+/* ── Alert banner ── */
+.alert-strip{background:var(--redsoft);border:1px solid #fecaca;border-radius:8px;padding:7px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;font-family:var(--body);font-size:12px;color:var(--red)}
+
+/* ── Footer ── */
+.page-footer{font-family:var(--mono);font-size:9px;color:var(--hint);text-align:center;padding:12px 0 20px;letter-spacing:.06em}
+
+/* ── Pagination ── */
+.pagination{display:flex;align-items:center;gap:6px;padding:10px 18px;border-top:1px solid var(--border);background:var(--raised)}
+.page-btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border);font-family:var(--mono);font-size:10px;cursor:pointer;background:var(--surface);color:var(--muted);transition:all .15s}
+.page-btn:hover{border-color:var(--blue);color:var(--blue)}
+.page-btn.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.page-btn:disabled{opacity:.4;cursor:not-allowed}
+.page-info{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:auto}
+
+/* ── Skeleton ── */
+.skel{background:linear-gradient(90deg,var(--raised) 25%,var(--border) 50%,var(--raised) 75%);background-size:200% 100%;animation:skel 1.5s infinite;border-radius:4px}
+@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+@keyframes countUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:960px){
+  .grid-2,.grid-3,.grid-4,.grid-2-1,.grid-1-2{grid-template-columns:1fr}
+  .kpi-row{flex-wrap:wrap}
+  .kpi-card{flex:1 1 170px}
+  .subheader{flex-direction:column;align-items:flex-start;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-logo">AP</div>
+    <div>
+      <div class="nav-title">Accounts Payable</div>
+      <div class="nav-sub">Finance Intelligence Portal</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px">
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('overview',this)">Overview</button>
+      <button class="nav-tab" onclick="switchTab('aging',this)">Aging</button>
+      <button class="nav-tab" onclick="switchTab('vendors',this)">Vendors</button>
+      <button class="nav-tab" onclick="switchTab('operations',this)">Operations</button>
+    </div>
+    <div class="nav-right">
+      <div class="nav-badge">⚠ 7 overdue</div>
+      <div class="nav-avatar">CFO</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Sub-header ── -->
+<div class="subheader">
+  <div>
+    <h1 id="page-title">AP Dashboard</h1>
+    <div class="subheader-meta">FY 2024–25 &nbsp;·&nbsp; Data as of <span>29 Nov 2024</span> &nbsp;·&nbsp; Microsoft Fabric &nbsp;·&nbsp; 25 invoices</div>
+  </div>
+  <div class="period-btns">
+    <button class="period-btn active" onclick="setPeriod(this,'MTD')">MTD</button>
+    <button class="period-btn" onclick="setPeriod(this,'QTD')">QTD</button>
+    <button class="period-btn" onclick="setPeriod(this,'YTD')">YTD</button>
+    <button class="period-btn" onclick="exportData()" style="margin-left:4px;border-left:1px solid var(--border)">⬇ Export</button>
+  </div>
+</div>
+
+<!-- ── KPI Band ── -->
+<div class="kpi-band">
+  <div class="kpi-row">
+    <div class="kpi-card navy" onclick="highlightKpi('total')">
+      <div class="kpi-header">
+        <div class="kpi-label">Total Payables</div>
+        <div class="kpi-icon" style="background:#eef2ff">📋</div>
+      </div>
+      <div class="kpi-value" id="kpi-total">₹1.29M</div>
+      <div class="kpi-sub">13 open invoices <span class="kpi-trend trend-up">↑ 4.2%</span></div>
+    </div>
+    <div class="kpi-card red" onclick="highlightKpi('overdue')">
+      <div class="kpi-header">
+        <div class="kpi-label">Overdue Amount</div>
+        <div class="kpi-icon" style="background:#fef2f2">⚠️</div>
+      </div>
+      <div class="kpi-value" id="kpi-overdue">₹8.7L</div>
+      <div class="kpi-sub">7 invoices past due <span class="kpi-trend trend-down">↑ 12%</span></div>
+    </div>
+    <div class="kpi-card green" onclick="highlightKpi('paid')">
+      <div class="kpi-header">
+        <div class="kpi-label">Paid This Month</div>
+        <div class="kpi-icon" style="background:#f0fdf4">✅</div>
+      </div>
+      <div class="kpi-value" id="kpi-paid">₹61,200</div>
+      <div class="kpi-sub">November 2024 <span class="kpi-trend trend-up">↑ 8.1%</span></div>
+    </div>
+    <div class="kpi-card amber" onclick="highlightKpi('dpo')">
+      <div class="kpi-header">
+        <div class="kpi-label">Days Payable (DPO)</div>
+        <div class="kpi-icon" style="background:#fffbeb">📅</div>
+      </div>
+      <div class="kpi-value" id="kpi-dpo">58 days</div>
+      <div class="kpi-sub">Target: ≤ 35 days <span class="kpi-trend trend-warn">+23d</span></div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-header">
+        <div class="kpi-label">Invoices Processed</div>
+        <div class="kpi-icon" style="background:#eff6ff">📄</div>
+      </div>
+      <div class="kpi-value" id="kpi-inv">25</div>
+      <div class="kpi-sub">Last 6 months</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TAB: OVERVIEW ══════════ -->
+<div class="main">
+<div id="tab-overview" class="tab-panel active">
+
+  <!-- Alert -->
+  <div class="alert-strip">
+    <span>🔴</span>
+    <strong>7 overdue invoices</strong> totalling ₹9.6L require immediate attention — oldest is 108 days past due.
+    <button onclick="filterByStatus('Overdue')" style="margin-left:auto;background:var(--red);color:#fff;border:none;padding:4px 12px;border-radius:6px;font-size:11px;font-family:var(--mono);cursor:pointer">View Overdue →</button>
+  </div>
+
+  <!-- Row 1: Monthly Trend + Aging -->
+  <div class="grid-2">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Monthly Invoice Trend</div>
+          <div class="card-hint">Jun – Nov 2024 &nbsp;·&nbsp; hover for details</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <div class="legend-item"><span class="legend-line" style="background:#1a56db"></span>Amount</div>
+          <div class="legend-item"><span class="legend-line" style="background:#059669"></span>Count</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:200px"><canvas id="chartMonthly"></canvas></div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Aging Analysis</div>
+          <div class="card-hint">Click a bar to filter invoices</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:200px"><canvas id="chartAging"></canvas></div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:8px;display:flex;gap:14px">
+        <span>1–30 days: <strong>6</strong></span>
+        <span>31–60 days: <strong>1</strong></span>
+        <span>61–90 days: <strong>3</strong></span>
+        <span>90+ days: <strong>3</strong></span>
+      </div>
+    </div>
+  </div>
+  <div style="height:14px"></div>
+
+  <!-- Row 2: Vendors + Status + Spend -->
+  <div class="grid-3">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header">
+        <div class="card-title">Top Vendors by Outstanding</div>
+        <div class="card-hint">Click to filter</div>
+      </div>
+      <div class="chart-wrap" style="height:220px"><canvas id="chartTopVendors"></canvas></div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header">
+        <div class="card-title">Invoice Status</div>
+      </div>
+      <div class="donut-wrap">
+        <div style="position:relative;flex-shrink:0">
+          <canvas id="chartInvStatus" width="130" height="130"></canvas>
+        </div>
+        <div class="donut-legend" id="legendInvStatus"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header">
+        <div class="card-title">Spend by Category</div>
+      </div>
+      <div class="chart-wrap" style="height:220px"><canvas id="chartSpend"></canvas></div>
+    </div>
+  </div>
+  <div style="height:14px"></div>
+
+  <!-- Invoice Register -->
+  <div class="card" style="padding:0;overflow:hidden">
+    <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <div class="card-title" style="margin:0">Invoice Register</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px" id="invRegSubtitle">25 records</div>
+      </div>
+      <div class="filter-row">
+        <input class="search-input" id="searchInput" placeholder="Search invoice / vendor / PO…" oninput="filterTable()"/>
+        <select class="filter-select" id="statusFilter" onchange="filterTable()">
+          <option value="">All</option>
+          <option>Paid</option>
+          <option>Approved</option>
+          <option>Pending</option>
+          <option>Overdue</option>
+          <option>Disputed</option>
+        </select>
+        <select class="filter-select" id="catFilter" onchange="filterTable()">
+          <option value="">All</option>
+          <option>Equipment</option>
+          <option>Software</option>
+          <option>Consulting</option>
+          <option>Logistics</option>
+          <option>IT Services</option>
+        </select>
+        <button onclick="clearFilters()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--raised);font-family:var(--mono);font-size:10px;color:var(--muted);cursor:pointer">✕ Clear</button>
+      </div>
+    </div>
+
+    <div id="activeFilterBanner" style="display:none" class="active-filter-banner">
+      <span id="filterBannerText"></span>
+      <button class="filter-clear-btn" onclick="clearFilters()">Clear filter</button>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortTable('id')" id="th-id">Invoice # <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('vendor')" id="th-vendor">Vendor <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('category')" id="th-category">Category <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('department')" id="th-department">Department <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('invoiceDate')" id="th-invoiceDate">Invoice Date <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('dueDate')" id="th-dueDate">Due Date <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('amount')" class="right" id="th-amount">Amount <span class="sort-icon">↓</span></th>
+            <th onclick="sortTable('daysOs')" id="th-daysOs">Days O/S <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('status')" id="th-status">Status <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('poNumber')" id="th-poNumber">PO Number <span class="sort-icon">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="invoiceTableBody"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;align-items:center;flex-wrap:wrap;border-top:1px solid var(--border);background:var(--raised);border-radius:0 0 12px 12px">
+      <div class="tbl-footer" style="border-top:none;background:transparent;flex:1" id="tblFooter"></div>
+      <div class="pagination" id="pagination" style="border-top:none;border-left:1px solid var(--border)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TAB: AGING ══════════ -->
+<div id="tab-aging" class="tab-panel">
+  <div class="grid-2">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header">
+        <div class="card-title">Outstanding by Aging Bucket</div>
+        <div class="card-hint">Click bar to drill through</div>
+      </div>
+      <div class="chart-wrap" style="height:280px"><canvas id="chartAgingFull"></canvas></div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header"><div class="card-title">Aging Summary</div></div>
+      <table>
+        <thead><tr><th>Bucket</th><th class="right">Count</th><th class="right">Outstanding</th><th class="right">Share</th></tr></thead>
+        <tbody id="agingTableBody"></tbody>
+      </table>
+      <div style="height:20px"></div>
+      <div class="card-header"><div class="card-title">Top Hold Reasons</div></div>
+      <div id="holdReasons"></div>
+    </div>
+  </div>
+  <div style="height:14px"></div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Outstanding by Vendor</div>
+      <div class="card-hint">Overdue invoices by vendor</div>
+    </div>
+    <div class="chart-wrap" style="height:220px"><canvas id="chartCountry"></canvas></div>
+  </div>
+</div>
+
+<!-- ══════════ TAB: VENDORS ══════════ -->
+<div id="tab-vendors" class="tab-panel">
+  <div class="grid-2">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header"><div class="card-title">Top 10 Vendors by Invoice Amount</div></div>
+      <div class="chart-wrap" style="height:300px"><canvas id="chartTopVendorsFull"></canvas></div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header"><div class="card-title">Category — Invoice vs Outstanding</div></div>
+      <div class="chart-wrap" style="height:300px"><canvas id="chartVendorCat"></canvas></div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot" style="background:var(--blue)"></span>Invoice Amount</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Outstanding</div>
+      </div>
+    </div>
+  </div>
+  <div style="height:14px"></div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Payment Method — Count and Amount</div></div>
+    <div class="chart-wrap" style="height:200px"><canvas id="chartPayMethod"></canvas></div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span>Payment Amount</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--amber)"></span>Invoice Count</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TAB: OPERATIONS ══════════ -->
+<div id="tab-operations" class="tab-panel">
+  <div class="grid-3">
+    <div class="card" style="margin-bottom:0">
+      <div class="ops-label">Straight-Through Processing</div>
+      <div class="ops-value" style="font-size:28px">80.1%</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:80.1%;background:var(--green)"></div></div>
+      <div class="ops-sub">16,695 of 20,838 invoices auto-processed</div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="ops-label">On-Time Payment Rate</div>
+      <div class="ops-value" style="font-size:28px">59.5%</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:59.5%;background:var(--teal)"></div></div>
+      <div class="ops-sub">12,408 paid within agreed terms</div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="ops-label">Average DPO</div>
+      <div class="ops-value" style="font-size:28px">52.6 days</div>
+      <div class="ops-sub">Avg days to pay: 38.5d &nbsp;·&nbsp; Target ≤ 45d</div>
+    </div>
+  </div>
+  <div style="height:14px"></div>
+  <div class="card" style="padding:0;overflow:hidden;margin-bottom:14px">
+    <div style="padding:14px 20px;border-bottom:1px solid var(--border)">
+      <div class="card-title" style="margin:0">AP Processor Performance</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px">On-time rate = invoices paid within agreed credit terms</div>
+    </div>
+    <table>
+      <thead><tr><th>Processor</th><th class="right">Invoices Handled</th><th class="right">On-Time Rate</th><th>Performance</th></tr></thead>
+      <tbody id="processorTableBody"></tbody>
+    </table>
+  </div>
+  <div class="grid-4">
+    <div class="ops-card" style="border-left:4px solid var(--blue)">
+      <div class="ops-label">Total Tax Collected</div>
+      <div class="ops-value" style="font-size:20px">$16.58M</div>
+    </div>
+    <div class="ops-card" style="border-left:4px solid var(--green)">
+      <div class="ops-label">Discounts Captured</div>
+      <div class="ops-value" style="font-size:20px">$1.71M</div>
+    </div>
+    <div class="ops-card" style="border-left:4px solid var(--red)">
+      <div class="ops-label">Late Fees Incurred</div>
+      <div class="ops-value" style="font-size:20px">$1.05M</div>
+    </div>
+    <div class="ops-card" style="border-left:4px solid var(--purple)">
+      <div class="ops-label">Fraud Risk Exposure</div>
+      <div class="ops-value" style="font-size:20px">$1.21M</div>
+    </div>
+  </div>
+</div>
+</div><!-- /main -->
+
+<div class="page-footer">ACCOUNTS PAYABLE INTELLIGENCE &nbsp;·&nbsp; FY 2024–25 &nbsp;·&nbsp; DATA AS OF 29 NOV 2024 &nbsp;·&nbsp; MICROSOFT FABRIC</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+
+const MONTHLY = {
+  labels:['Jun','Jul','Aug','Sep','Oct','Nov'],
+  amount:[580000,620000,595000,720000,680000,750000],
+  count: [18,20,19,24,22,25]
+};
+
+const AGING_DATA = [
+  {bucket:'1–30 Days', count:6, outstanding:420000, color:'#1a56db'},
+  {bucket:'31–60 Days',count:1, outstanding:85000,  color:'#d97706'},
+  {bucket:'61–90 Days',count:3, outstanding:380000, color:'#ea580c'},
+  {bucket:'90+ Days',  count:3, outstanding:490000, color:'#dc2626'},
+];
+
+const HOLD_REASONS = [
+  {reason:'PO Not Receipted',           count:1054},
+  {reason:'Invoice Amount Discrepancy', count:1015},
+  {reason:'Qty vs PO Discrepancy',      count:571 },
+  {reason:'Invoice Date >12M Old',      count:562 },
+  {reason:'Invoice Date > Scan Date',   count:550 },
+  {reason:'Freight Discrepancy',        count:467 },
+];
+
+const VENDOR_OUTSTANDING = [
+  {name:'ABB Ltd',          amount:395000},
+  {name:'Siemens AG',       amount:280000},
+  {name:'Oracle Corp',      amount:260000},
+  {name:'Tata Consultancy', amount:210000},
+  {name:'Accenture',        amount:150000},
+  {name:'SAP SE',           amount:120000},
+  {name:'Wipro Ltd',        amount:110000},
+];
+
+const SPEND_CATEGORY = [
+  {name:'Equipment',   amount:820000, color:'#059669'},
+  {name:'Software',    amount:490000, color:'#1a56db'},
+  {name:'Consulting',  amount:380000, color:'#7c3aed'},
+  {name:'Logistics',   amount:180000, color:'#d97706'},
+  {name:'IT Services', amount:120000, color:'#0891b2'},
+  {name:'Maintenance', amount:95000,  color:'#059669'},
+  {name:'Cloud',       amount:80000,  color:'#6366f1'},
+  {name:'Audit',       amount:55000,  color:'#9333ea'},
+  {name:'Banking',     amount:30000,  color:'#475569'},
+];
+
+const INV_STATUS_DATA = [
+  {name:'Paid',     v:12, c:'#16a34a'},
+  {name:'Approved', v:3,  c:'#1a56db'},
+  {name:'Pending',  v:2,  c:'#d97706'},
+  {name:'Overdue',  v:7,  c:'#dc2626'},
+  {name:'Disputed', v:1,  c:'#7c3aed'},
+];
+
+const TOP_VENDORS = [
+  {name:'Durham',   amount:5490989},
+  {name:'Fowler',   amount:3700370},
+  {name:'Gardner',  amount:3079276},
+  {name:'Brown',    amount:2927187},
+  {name:'Smith',    amount:2461993},
+  {name:'Benson',   amount:2369695},
+  {name:'Johnson',  amount:1957819},
+  {name:'Williams', amount:1878000},
+  {name:'Lopez',    amount:1814977},
+  {name:'Thomas',   amount:1658830},
+];
+
+const VENDOR_CAT = [
+  {name:'Direct Material',inv:66336435,outstanding:455184},
+  {name:'Utility',        inv:17639183,outstanding:120289},
+  {name:'Capital Goods',  inv:16808454,outstanding:117780},
+  {name:'Indirect Spend', inv:16546549,outstanding:115444},
+  {name:'Service',        inv:16446845,outstanding:115804},
+  {name:'Technology',     inv:15837065,outstanding:118627},
+];
+
+const PAY_METHOD = [
+  {method:'Credit Card',  count:4770,amount:27542825},
+  {method:'Cheque',       count:4641,amount:27151939},
+  {method:'Bank Transfer',count:4630,amount:26785039},
+  {method:'Pending',      count:6797,amount:39317572},
+];
+
+const PROCESSORS = [
+  {name:'Michael Hebert',   count:3755,rate:58.5},
+  {name:'Anthony Little',   count:3060,rate:60.0},
+  {name:'Robert Giles',     count:2585,rate:59.5},
+  {name:'Danielle Mitchell',count:2449,rate:61.5},
+  {name:'Sydney Brennan',   count:2284,rate:58.4},
+  {name:'Brian Murray',     count:1829,rate:60.8},
+];
+
+const INVOICES = [
+  {id:'INV-2401',vendor:'Siemens AG',     category:'Equipment',   department:'Operations', invoiceDate:'2024-11-01',dueDate:'2024-11-30',amount:150000,daysOs:108,status:'Overdue',  poNumber:'PO-8821'},
+  {id:'INV-2422',vendor:'Oracle Corp',    category:'Software',    department:'IT',         invoiceDate:'2024-09-22',dueDate:'2024-10-22',amount:110000,daysOs:97, status:'Overdue',  poNumber:'PO-8842'},
+  {id:'INV-2423',vendor:'ABB Ltd',        category:'Equipment',   department:'Operations', invoiceDate:'2024-09-25',dueDate:'2024-10-25',amount:180000,daysOs:94, status:'Overdue',  poNumber:'PO-8843'},
+  {id:'INV-2402',vendor:'SAP SE',         category:'Software',    department:'IT',         invoiceDate:'2024-11-05',dueDate:'2024-12-05',amount:64200, daysOs:73, status:'Overdue',  poNumber:'PO-8822'},
+  {id:'INV-2411',vendor:'Accenture',      category:'Consulting',  department:'Strategy',   invoiceDate:'2024-10-05',dueDate:'2024-11-05',amount:88000, daysOs:73, status:'Overdue',  poNumber:'PO-8831'},
+  {id:'INV-2412',vendor:'ABB Ltd',        category:'Equipment',   department:'Operations', invoiceDate:'2024-10-10',dueDate:'2024-11-10',amount:210000,daysOs:68, status:'Overdue',  poNumber:'PO-8832'},
+  {id:'INV-2430',vendor:'Wipro Ltd',      category:'IT Services', department:'IT',         invoiceDate:'2024-10-20',dueDate:'2024-11-20',amount:95000, daysOs:58, status:'Overdue',  poNumber:'PO-8851'},
+  {id:'INV-2415',vendor:'Tata Consultancy',category:'Consulting', department:'Finance',    invoiceDate:'2024-11-10',dueDate:'2024-12-10',amount:125000,daysOs:18, status:'Approved', poNumber:'PO-8835'},
+  {id:'INV-2416',vendor:'Siemens AG',     category:'Equipment',   department:'Operations', invoiceDate:'2024-11-12',dueDate:'2024-12-12',amount:87000, daysOs:16, status:'Approved', poNumber:'PO-8836'},
+  {id:'INV-2431',vendor:'Oracle Corp',    category:'Software',    department:'IT',         invoiceDate:'2024-11-15',dueDate:'2024-12-15',amount:54000, daysOs:13, status:'Approved', poNumber:'PO-8852'},
+  {id:'INV-2420',vendor:'ABB Ltd',        category:'Equipment',   department:'Operations', invoiceDate:'2024-11-18',dueDate:'2024-12-18',amount:320000,daysOs:10, status:'Pending',  poNumber:'PO-8841'},
+  {id:'INV-2421',vendor:'Accenture',      category:'Consulting',  department:'Strategy',   invoiceDate:'2024-11-20',dueDate:'2024-12-20',amount:42000, daysOs:8,  status:'Pending',  poNumber:'PO-8841'},
+  {id:'INV-2440',vendor:'Wipro Ltd',      category:'IT Services', department:'IT',         invoiceDate:'2024-11-22',dueDate:'2024-12-22',amount:38000, daysOs:6,  status:'Disputed', poNumber:'PO-8861'},
+  {id:'INV-2300',vendor:'Tata Consultancy',category:'Consulting', department:'HR',         invoiceDate:'2024-09-01',dueDate:'2024-10-01',amount:76000, daysOs:0,  status:'Paid',     poNumber:'PO-8720'},
+  {id:'INV-2301',vendor:'SAP SE',         category:'Software',    department:'IT',         invoiceDate:'2024-09-05',dueDate:'2024-10-05',amount:95000, daysOs:0,  status:'Paid',     poNumber:'PO-8721'},
+  {id:'INV-2302',vendor:'ABB Ltd',        category:'Equipment',   department:'Operations', invoiceDate:'2024-09-08',dueDate:'2024-10-08',amount:142000,daysOs:0,  status:'Paid',     poNumber:'PO-8722'},
+  {id:'INV-2303',vendor:'Siemens AG',     category:'Equipment',   department:'Operations', invoiceDate:'2024-09-12',dueDate:'2024-10-12',amount:118000,daysOs:0,  status:'Paid',     poNumber:'PO-8723'},
+  {id:'INV-2310',vendor:'Oracle Corp',    category:'Software',    department:'IT',         invoiceDate:'2024-09-15',dueDate:'2024-10-15',amount:89000, daysOs:0,  status:'Paid',     poNumber:'PO-8730'},
+  {id:'INV-2311',vendor:'Accenture',      category:'Consulting',  department:'Finance',    invoiceDate:'2024-09-18',dueDate:'2024-10-18',amount:67000, daysOs:0,  status:'Paid',     poNumber:'PO-8731'},
+  {id:'INV-2312',vendor:'Wipro Ltd',      category:'IT Services', department:'IT',         invoiceDate:'2024-09-20',dueDate:'2024-10-20',amount:44000, daysOs:0,  status:'Paid',     poNumber:'PO-8732'},
+  {id:'INV-2320',vendor:'Tata Consultancy',category:'Consulting', department:'Operations', invoiceDate:'2024-10-01',dueDate:'2024-11-01',amount:91000, daysOs:0,  status:'Paid',     poNumber:'PO-8740'},
+  {id:'INV-2321',vendor:'SAP SE',         category:'Software',    department:'Finance',    invoiceDate:'2024-10-05',dueDate:'2024-11-05',amount:77000, daysOs:0,  status:'Paid',     poNumber:'PO-8741'},
+  {id:'INV-2322',vendor:'ABB Ltd',        category:'Equipment',   department:'Operations', invoiceDate:'2024-10-08',dueDate:'2024-11-08',amount:185000,daysOs:0,  status:'Paid',     poNumber:'PO-8742'},
+  {id:'INV-2330',vendor:'Siemens AG',     category:'Equipment',   department:'Operations', invoiceDate:'2024-10-15',dueDate:'2024-11-15',amount:102000,daysOs:0,  status:'Paid',     poNumber:'PO-8750'},
+  {id:'INV-2331',vendor:'Oracle Corp',    category:'Software',    department:'IT',         invoiceDate:'2024-10-20',dueDate:'2024-11-20',amount:63000, daysOs:0,  status:'Paid',     poNumber:'PO-8751'},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+const fmtRs = v => v>=1e6?`₹${(v/1e6).toFixed(2)}M`:v>=1e5?`₹${(v/1e5).toFixed(1)}L`:v>=1e3?`₹${(v/1e3).toFixed(0)}K`:`₹${v.toLocaleString()}`;
+const fmt$  = v => v>=1e6?`$${(v/1e6).toFixed(2)}M`:v>=1e3?`$${(v/1e3).toFixed(1)}K`:`$${v.toLocaleString()}`;
+const pct   = (a,b)=>b?((a/b)*100).toFixed(1)+'%':'—';
+
+const TOOLTIP_STYLE = {
+  backgroundColor:'#0d1b3e',
+  titleColor:'#93c5fd',
+  bodyColor:'#e2e8f0',
+  borderColor:'#1a3060',
+  borderWidth:1,
+  padding:12,
+  cornerRadius:8,
+  titleFont:{family:"'JetBrains Mono',monospace",size:10,weight:'500'},
+  bodyFont:{family:"'JetBrains Mono',monospace",size:11}
+};
+
+// ═══════════════════════════════════════════════════════════════
+// TAB & PERIOD
+// ═══════════════════════════════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('page-title').textContent = 'AP Dashboard — '+name.charAt(0).toUpperCase()+name.slice(1);
+  if(name==='aging'     &&!window._agingDone)    {buildAgingTab();   window._agingDone=true;}
+  if(name==='vendors'   &&!window._vendorsDone)  {buildVendorTab();  window._vendorsDone=true;}
+  if(name==='operations'&&!window._opsDone)      {buildOpsTab();     window._opsDone=true;}
+}
+
+function setPeriod(btn, period) {
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function exportData() {
+  const rows = [['Invoice #','Vendor','Category','Department','Invoice Date','Due Date','Amount','Days O/S','Status','PO Number']];
+  INVOICES.forEach(r=>rows.push([r.id,r.vendor,r.category,r.department,r.invoiceDate,r.dueDate,r.amount,r.daysOs,r.status,r.poNumber]));
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download = 'ap_report.csv';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// OVERVIEW CHARTS
+// ═══════════════════════════════════════════════════════════════
+function buildOverview() {
+  // Monthly trend
+  new Chart(document.getElementById('chartMonthly'),{
+    type:'line',
+    data:{
+      labels:MONTHLY.labels,
+      datasets:[
+        {label:'Invoice Amount',yAxisID:'y',data:MONTHLY.amount,borderColor:'#1a56db',backgroundColor:'rgba(26,86,219,.08)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#1a56db',pointBorderColor:'#fff',pointBorderWidth:2,tension:.4,fill:true},
+        {label:'Invoice Count',yAxisID:'y2',data:MONTHLY.count,borderColor:'#059669',backgroundColor:'rgba(5,150,105,.06)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#059669',pointBorderColor:'#fff',pointBorderWidth:2,tension:.4,fill:false},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{...TOOLTIP_STYLE,callbacks:{label:ctx=>ctx.datasetIndex===0?' Amount: '+fmtRs(ctx.raw):' Count: '+ctx.raw}}},
+      scales:{
+        x:{grid:{display:false},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:10}}},
+        y:{grid:{color:'#f0f0f0'},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:10},callback:v=>fmtRs(v)}},
+        y2:{position:'right',grid:{display:false},border:{display:false},ticks:{color:'#059669',font:{family:"'JetBrains Mono',monospace",size:10}}}
+      }
+    }
+  });
+
+  // Aging bar (clickable)
+  const agingChart = new Chart(document.getElementById('chartAging'),{
+    type:'bar',
+    data:{
+      labels:AGING_DATA.map(d=>d.bucket),
+      datasets:[{
+        data:AGING_DATA.map(d=>d.count),
+        backgroundColor:AGING_DATA.map(d=>d.color+'cc'),
+        borderColor:AGING_DATA.map(d=>d.color),
+        borderWidth:1.5,borderRadius:6,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{...TOOLTIP_STYLE,callbacks:{label:ctx=>' '+ctx.label+': '+ctx.raw+' invoices'}}},
+      scales:{
+        x:{grid:{display:false},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:10}}},
+        y:{grid:{color:'#f0f0f0'},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:10}}}
+      },
+      onClick:(e,els)=>{
+        if(!els.length) return;
+        const bucket = AGING_DATA[els[0].index].bucket;
+        const dayRange = bucket.replace(' Days','');
+        filterByAging(dayRange);
+      }
+    }
+  });
+
+  // Top vendors horizontal bar (clickable)
+  const vendorChart = new Chart(document.getElementById('chartTopVendors'),{
+    type:'bar',
+    data:{
+      labels:VENDOR_OUTSTANDING.map(d=>d.name),
+      datasets:[{
+        data:VENDOR_OUTSTANDING.map(d=>d.amount),
+        backgroundColor:'rgba(26,86,219,.75)',
+        borderColor:'#1a56db',
+        borderWidth:1,
+        borderRadius:{topRight:5,bottomRight:5},
+        hoverBackgroundColor:'#1a56db',
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{...TOOLTIP_STYLE,callbacks:{label:ctx=>' Outstanding: '+fmtRs(ctx.raw)}}},
+      scales:{
+        x:{grid:{color:'#f0f0f0'},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:9},callback:v=>fmtRs(v)}},
+        y:{grid:{display:false},border:{display:false},ticks:{color:'#1a1a2e',font:{family:"'Nunito Sans',sans-serif",size:11,weight:'600'}}}
+      },
+      onClick:(e,els)=>{
+        if(!els.length) return;
+        const vendor = VENDOR_OUTSTANDING[els[0].index].name;
+        filterByVendor(vendor);
+      }
+    }
+  });
+
+  // Spend by category horizontal bar
+  new Chart(document.getElementById('chartSpend'),{
+    type:'bar',
+    data:{
+      labels:SPEND_CATEGORY.map(d=>d.name),
+      datasets:[{
+        data:SPEND_CATEGORY.map(d=>d.amount),
+        backgroundColor:'rgba(5,150,105,.75)',
+        borderColor:'#059669',
+        borderWidth:1,
+        borderRadius:{topRight:5,bottomRight:5},
+        hoverBackgroundColor:'#059669',
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{...TOOLTIP_STYLE,callbacks:{label:ctx=>' '+fmtRs(ctx.raw)}}},
+      scales:{
+        x:{grid:{color:'#f0f0f0'},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:9},callback:v=>fmtRs(v)}},
+        y:{grid:{display:false},border:{display:false},ticks:{color:'#374151',font:{family:"'Nunito Sans',sans-serif",size:11}}}
+      }
+    }
+  });
+
+  // Invoice status donut
+  buildDonut();
+
+  renderTable();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DONUT CHART
+// ═══════════════════════════════════════════════════════════════
+let donutChart = null;
+let activeDonutFilter = null;
+
+function buildDonut() {
+  const total = INV_STATUS_DATA.reduce((s,d)=>s+d.v,0);
+  donutChart = new Chart(document.getElementById('chartInvStatus'),{
+    type:'doughnut',
+    data:{
+      labels:INV_STATUS_DATA.map(d=>d.name),
+      datasets:[{
+        data:INV_STATUS_DATA.map(d=>d.v),
+        backgroundColor:INV_STATUS_DATA.map(d=>d.c),
+        borderWidth:3,
+        borderColor:'#fff',
+        hoverOffset:6,
+        hoverBorderWidth:3,
+      }]
+    },
+    options:{
+      cutout:'68%',
+      plugins:{
+        legend:{display:false},
+        tooltip:{...TOOLTIP_STYLE,callbacks:{label:ctx=>' '+ctx.label+': '+ctx.raw+' ('+pct(ctx.raw,total)+')'}}
+      },
+      animation:{duration:700,easing:'easeInOutQuart'},
+      onClick:(e,els)=>{
+        if(!els.length){clearFilters();return;}
+        const status = INV_STATUS_DATA[els[0].index].name;
+        filterByStatus(status);
+      }
+    }
+  });
+
+  const leg = document.getElementById('legendInvStatus');
+  INV_STATUS_DATA.forEach((d,i)=>{
+    const row = document.createElement('div');
+    row.className='donut-row';
+    row.id='donut-row-'+i;
+    row.innerHTML=`
+      <div class="donut-label">
+        <span class="donut-swatch" style="background:${d.c}"></span>${d.name}
+      </div>
+      <div>
+        <span class="donut-count">${d.v}</span>
+        <span class="donut-pct">(${pct(d.v,total)})</span>
+      </div>`;
+    row.onclick=()=>filterByStatus(d.name);
+    leg.appendChild(row);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INVOICE TABLE
+// ═══════════════════════════════════════════════════════════════
+let tableData = [...INVOICES];
+let sortKey='daysOs', sortAsc=false;
+let currentPage=1;
+const pageSize=10;
+let activeFilters={search:'',status:'',category:'',aging:null,vendor:null};
+
+function badgeClass(s){
+  if(s==='Paid')     return 'badge-paid';
+  if(s==='Approved') return 'badge-approved';
+  if(s==='Pending')  return 'badge-pending';
+  if(s==='Overdue')  return 'badge-overdue';
+  if(s==='Disputed') return 'badge-disputed';
+  return 'badge-pending';
+}
+
+function sortTable(key){
+  document.querySelectorAll('th').forEach(t=>t.classList.remove('sorted'));
+  const th = document.getElementById('th-'+key);
+  if(th){th.classList.add('sorted');}
+  if(sortKey===key) sortAsc=!sortAsc; else{sortKey=key;sortAsc=key!=='daysOs';}
+  currentPage=1;
+  renderTable();
+}
+
+function filterByStatus(status){
+  activeFilters.status=status;
+  document.getElementById('statusFilter').value=status;
+  activeFilters.aging=null;
+  activeFilters.vendor=null;
+  currentPage=1;
+  applyFilters();
+  showFilterBanner('Status: '+status);
+  updateDonutHighlight(status);
+  // scroll to register
+  document.querySelector('.card[style*="overflow:hidden"]') &&
+    document.getElementById('invoiceTableBody').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function filterByAging(aging){
+  activeFilters.aging=aging;
+  activeFilters.status='';
+  activeFilters.vendor=null;
+  document.getElementById('statusFilter').value='';
+  currentPage=1;
+  applyFilters();
+  showFilterBanner('Aging bucket: '+aging+' Days');
+}
+
+function filterByVendor(vendor){
+  activeFilters.vendor=vendor;
+  activeFilters.aging=null;
+  currentPage=1;
+  applyFilters();
+  showFilterBanner('Vendor: '+vendor);
+}
+
+function filterTable(){
+  activeFilters.search=document.getElementById('searchInput').value.toLowerCase();
+  activeFilters.status=document.getElementById('statusFilter').value;
+  activeFilters.category=document.getElementById('catFilter').value;
+  activeFilters.aging=null;
+  activeFilters.vendor=null;
+  currentPage=1;
+  applyFilters();
+  if(activeFilters.status) showFilterBanner('Status: '+activeFilters.status);
+  else hideBanner();
+}
+
+function applyFilters(){
+  tableData=INVOICES.filter(r=>{
+    const q=activeFilters.search;
+    const matchSearch=!q||(r.id.toLowerCase().includes(q)||r.vendor.toLowerCase().includes(q)||r.poNumber.toLowerCase().includes(q)||r.category.toLowerCase().includes(q));
+    const matchStatus=!activeFilters.status||r.status===activeFilters.status;
+    const matchCat=!activeFilters.category||r.category===activeFilters.category;
+    const matchAging=!activeFilters.aging||r.status==='Overdue';
+    const matchVendor=!activeFilters.vendor||r.vendor===activeFilters.vendor;
+    return matchSearch&&matchStatus&&matchCat&&matchAging&&matchVendor;
+  });
+  renderTable();
+}
+
+function clearFilters(){
+  activeFilters={search:'',status:'',category:'',aging:null,vendor:null};
+  document.getElementById('searchInput').value='';
+  document.getElementById('statusFilter').value='';
+  document.getElementById('catFilter').value='';
+  tableData=[...INVOICES];
+  currentPage=1;
+  hideBanner();
+  updateDonutHighlight(null);
+  renderTable();
+}
+
+function showFilterBanner(text){
+  const b=document.getElementById('activeFilterBanner');
+  document.getElementById('filterBannerText').textContent='Filtered by: '+text;
+  b.style.display='flex';
+  b.style.margin='0 20px 8px';
+}
+function hideBanner(){document.getElementById('activeFilterBanner').style.display='none';}
+
+function updateDonutHighlight(status){
+  INV_STATUS_DATA.forEach((d,i)=>{
+    const row=document.getElementById('donut-row-'+i);
+    if(!row) return;
+    if(!status) row.classList.remove('dimmed');
+    else if(d.name===status) row.classList.remove('dimmed');
+    else row.classList.add('dimmed');
+  });
+}
+
+function highlightKpi(type){
+  if(type==='overdue') filterByStatus('Overdue');
+  else clearFilters();
+}
+
+function renderTable(){
+  tableData.sort((a,b)=>{
+    const av=a[sortKey],bv=b[sortKey];
+    const c=typeof av==='number'?av-bv:String(av).localeCompare(String(bv));
+    return sortAsc?c:-c;
+  });
+  const totalPages=Math.max(1,Math.ceil(tableData.length/pageSize));
+  currentPage=Math.min(currentPage,totalPages);
+  const slice=tableData.slice((currentPage-1)*pageSize,currentPage*pageSize);
+
+  document.getElementById('invRegSubtitle').textContent=tableData.length+' records'+(tableData.length!==INVOICES.length?' (filtered)':'');
+
+  document.getElementById('invoiceTableBody').innerHTML=slice.map(r=>{
+    const dueCls=r.daysOs>60?'days-over':r.daysOs>0?'days-warn':'';
+    const dueStyle=r.daysOs>0?'color:var(--red)':'color:var(--muted)';
+    const dueTxt=r.dueDate;
+    return `<tr>
+      <td class="id">${r.id}</td>
+      <td class="vendor">${r.vendor}</td>
+      <td>${r.category}</td>
+      <td>${r.department}</td>
+      <td style="font-family:var(--mono);font-size:11px">${r.invoiceDate}</td>
+      <td style="font-family:var(--mono);font-size:11px;${r.daysOs>0?'color:var(--red);':'color:var(--muted);'}">${dueTxt}</td>
+      <td class="amount">${fmtRs(r.amount)}</td>
+      <td class="${dueCls}" style="font-size:11px">${r.daysOs>0?r.daysOs+'d':'—'}</td>
+      <td><span class="badge ${badgeClass(r.status)}"><span class="badge-dot" style="background:currentColor"></span>${r.status}</span></td>
+      <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">${r.poNumber}</td>
+    </tr>`;
+  }).join('');
+
+  const total=tableData.reduce((s,r)=>s+r.amount,0);
+  const overdue=tableData.filter(r=>r.status==='Overdue').reduce((s,r)=>s+r.amount,0);
+  document.getElementById('tblFooter').innerHTML=
+    `<div class="tbl-footer-stat">Total Amount <strong>${fmtRs(total)}</strong></div>
+     <div class="tbl-footer-stat">Overdue <strong>${fmtRs(overdue)}</strong></div>
+     <div class="tbl-footer-stat">Showing <strong>${slice.length} / ${tableData.length}</strong></div>`;
+
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages){
+  const pg=document.getElementById('pagination');
+  if(totalPages<=1){pg.innerHTML='';return;}
+  let html=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ Prev</button>`;
+  for(let i=1;i<=totalPages;i++){
+    if(i===1||i===totalPages||Math.abs(i-currentPage)<=1){
+      html+=`<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    } else if(Math.abs(i-currentPage)===2){
+      html+=`<span style="color:var(--hint);font-size:12px">…</span>`;
+    }
+  }
+  html+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>Next ›</button>`;
+  html+=`<span class="page-info">Page ${currentPage} of ${totalPages}</span>`;
+  pg.innerHTML=html;
+}
+
+function goPage(p){
+  currentPage=p;
+  renderTable();
+  document.getElementById('invoiceTableBody').parentElement.parentElement.scrollTop=0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AGING TAB
+// ═══════════════════════════════════════════════════════════════
+function buildAgingTab(){
+  new Chart(document.getElementById('chartAgingFull'),{
+    type:'bar',
+    data:{labels:AGING_DATA.map(d=>d.bucket),datasets:[{
+      data:AGING_DATA.map(d=>d.outstanding),label:'Outstanding (₹)',
+      backgroundColor:AGING_DATA.map(d=>d.color+'cc'),
+      borderColor:AGING_DATA.map(d=>d.color),
+      borderWidth:1.5,borderRadius:6,
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{...TOOLTIP_STYLE,callbacks:{label:ctx=>' '+fmtRs(ctx.raw)}}},
+      scales:{
+        x:{grid:{display:false},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:10}}},
+        y:{grid:{color:'#f0f0f0'},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:10},callback:v=>fmtRs(v)}}
+      }
+    }
+  });
+
+  const total=AGING_DATA.reduce((s,a)=>s+a.outstanding,0);
+  document.getElementById('agingTableBody').innerHTML=AGING_DATA.map((a,i)=>`
+    <tr>
+      <td><span style="display:inline-flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:2px;background:${a.color};display:inline-block"></span>${a.bucket}</span></td>
+      <td class="right" style="font-family:var(--mono)">${a.count}</td>
+      <td class="right" style="font-family:var(--mono);color:${a.color};font-weight:600">${fmtRs(a.outstanding)}</td>
+      <td class="right" style="font-family:var(--mono)">${pct(a.outstanding,total)}</td>
+    </tr>`).join('')+
+    `<tr style="background:var(--raised);border-top:2px solid var(--border)">
+      <td style="font-family:var(--display);font-weight:700;color:var(--navy)">Total</td>
+      <td class="right" style="font-family:var(--mono);font-weight:700;color:var(--navy)">${AGING_DATA.reduce((s,a)=>s+a.count,0)}</td>
+      <td class="right" style="font-family:var(--mono);font-weight:700;color:var(--navy)">${fmtRs(total)}</td>
+      <td class="right" style="font-family:var(--mono);color:var(--muted)">100%</td>
+    </tr>`;
+
+  document.getElementById('holdReasons').innerHTML=HOLD_REASONS.map(h=>`
+    <div class="hold-row">
+      <div class="hold-top"><span class="hold-label">${h.reason}</span><span class="hold-count">${h.count.toLocaleString()}</span></div>
+      <div class="hold-bar"><div class="hold-fill" style="width:${(h.count/1054*100).toFixed(0)}%"></div></div>
+    </div>`).join('');
+
+  new Chart(document.getElementById('chartCountry'),{
+    type:'bar',
+    data:{labels:VENDOR_OUTSTANDING.map(d=>d.name),datasets:[{
+      data:VENDOR_OUTSTANDING.map(d=>d.amount),
+      backgroundColor:'rgba(13,27,62,.8)',borderColor:'#0d1b3e',borderWidth:1,borderRadius:5,
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{...TOOLTIP_STYLE,callbacks:{label:ctx=>' '+fmtRs(ctx.raw)}}},
+      scales:{
+        x:{grid:{display:false},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:10}}},
+        y:{grid:{color:'#f0f0f0'},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:10},callback:v=>fmtRs(v)}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VENDOR TAB
+// ═══════════════════════════════════════════════════════════════
+function buildVendorTab(){
+  new Chart(document.getElementById('chartTopVendorsFull'),{
+    type:'bar',
+    data:{labels:TOP_VENDORS.map(d=>d.name),datasets:[{
+      data:TOP_VENDORS.map(d=>d.amount),
+      backgroundColor:'rgba(13,27,62,.82)',borderColor:'#0d1b3e',borderWidth:1,borderRadius:{topRight:5,bottomRight:5},
+    }]},
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{...TOOLTIP_STYLE,callbacks:{label:ctx=>' '+fmt$(ctx.raw)}}},
+      scales:{
+        x:{grid:{color:'#f0f0f0'},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:9},callback:v=>fmt$(v)}},
+        y:{grid:{display:false},border:{display:false},ticks:{color:'#1a1a2e',font:{family:"'Nunito Sans',sans-serif",size:11,weight:'600'}}}
+      }
+    }
+  });
+
+  new Chart(document.getElementById('chartVendorCat'),{
+    type:'bar',
+    data:{labels:VENDOR_CAT.map(d=>d.name),datasets:[
+      {label:'Invoice Amount',data:VENDOR_CAT.map(d=>d.inv),        backgroundColor:'rgba(26,86,219,.7)',borderColor:'#1a56db',borderWidth:1,borderRadius:4},
+      {label:'Outstanding',   data:VENDOR_CAT.map(d=>d.outstanding),backgroundColor:'rgba(220,38,38,.75)',borderColor:'#dc2626',borderWidth:1,borderRadius:4},
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{...TOOLTIP_STYLE,callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt$(ctx.raw)}}},
+      scales:{
+        x:{grid:{display:false},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:9}}},
+        y:{grid:{color:'#f0f0f0'},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:9},callback:v=>fmt$(v)}}
+      }
+    }
+  });
+
+  new Chart(document.getElementById('chartPayMethod'),{
+    type:'bar',
+    data:{labels:PAY_METHOD.map(d=>d.method),datasets:[
+      {label:'Payment Amount',data:PAY_METHOD.map(d=>d.amount),yAxisID:'y', backgroundColor:'rgba(5,150,105,.78)',borderColor:'#059669',borderWidth:1,borderRadius:5},
+      {label:'Invoice Count', data:PAY_METHOD.map(d=>d.count), yAxisID:'y2',backgroundColor:'rgba(217,119,6,.72)', borderColor:'#d97706',borderWidth:1,borderRadius:5},
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{...TOOLTIP_STYLE}},
+      scales:{
+        x:{grid:{display:false},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:10}}},
+        y:{grid:{color:'#f0f0f0'},border:{display:false},position:'left',ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:9},callback:v=>fmt$(v)}},
+        y2:{position:'right',grid:{display:false},border:{display:false},ticks:{color:'#6b7280',font:{family:"'JetBrains Mono',monospace",size:10}}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// OPS TAB
+// ═══════════════════════════════════════════════════════════════
+function buildOpsTab(){
+  document.getElementById('processorTableBody').innerHTML=PROCESSORS.map((p,i)=>{
+    const c=p.rate>=61?'var(--green)':p.rate>=59?'var(--amber)':'var(--red)';
+    return `<tr style="background:${i%2===0?'var(--surface)':'var(--raised)'}">
+      <td style="color:var(--navy);font-weight:600">${p.name}</td>
+      <td class="right" style="font-family:var(--mono)">${p.count.toLocaleString()}</td>
+      <td class="right" style="font-family:var(--mono);color:${c};font-weight:600">${p.rate}%</td>
+      <td style="min-width:160px;padding:10px 12px">
+        <div class="rate-bar-wrap">
+          <div class="rate-bar-track"><div class="rate-bar-fill" style="width:${p.rate}%;background:${c}"></div></div>
+          <span style="font-family:var(--mono);font-size:10px;color:${c}">${p.rate}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+Chart.defaults.font.family="'JetBrains Mono',monospace";
+Chart.defaults.font.size=10;
+Chart.defaults.color='#6b7280';
+buildOverview();
+</script>
+</body>
+</html>
